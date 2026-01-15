@@ -1,0 +1,1049 @@
+<Window x:Class="MyLanServer.UI.Views.TaskConfigDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:local="clr-namespace:MyLanServer.UI.Converters"
+        mc:Ignorable="d"
+        Style="{StaticResource MaterialDesignWindow}"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="14"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        Title="任务配置" Height="700" Width="750"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="SingleBorderWindow"
+        AllowsTransparency="False"
+        ResizeMode="CanResizeWithGrip">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="46" ResizeBorderThickness="6" CornerRadius="0" GlassFrameThickness="0,0,0,1"
+                      UseAeroCaptionButtons="False" />
+    </WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <!-- 转换器资源 -->
+        <local:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <local:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
+
+        <!-- 窗口控制按钮样式 -->
+        <Style x:Key="WindowControlButtonStyle" TargetType="Button" BasedOn="{StaticResource MaterialDesignIconButton}">
+            <Setter Property="Width" Value="40" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+            <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+        </Style>
+    </Window.Resources>
+
+    <materialDesign:Card UniformCornerRadius="12" Margin="0" materialDesign:ElevationAssist.Elevation="Dp4"
+                         Background="{DynamicResource MaterialDesignPaper}" BorderThickness="0">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- 标题栏 -->
+            <Grid Grid.Row="0" Height="46" Background="Transparent">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
+                    <materialDesign:PackIcon Kind="Cog" VerticalAlignment="Center" Margin="0,0,8,0"
+                                             Foreground="{DynamicResource MaterialDesignPrimary}" />
+                    <TextBlock Text="任务配置" VerticalAlignment="Center" FontWeight="Medium" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                    <Button Style="{StaticResource WindowControlButtonStyle}" Click="CloseButton_Click" ToolTip="关闭">
+                        <materialDesign:PackIcon Kind="WindowClose" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <!-- 内容区域 -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="16,8,16,16">
+                <StackPanel>
+                    <!-- 任务ID -->
+                    <Border Margin="0,0,0,16" CornerRadius="8" Padding="16"
+                            Background="{DynamicResource MaterialDesignCardBackground}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"
+                                        Margin="0,0,16,0">
+                                <materialDesign:PackIcon Kind="Identifier" VerticalAlignment="Center" Margin="0,0,8,0"
+                                                         Foreground="{DynamicResource MaterialDesignPrimary}" />
+                                <TextBlock Text="任务ID" FontWeight="Medium" />
+                            </StackPanel>
+                            <TextBox Grid.Column="1"
+                                     Text="{Binding TaskSlug}"
+                                     IsReadOnly="True"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Padding="8,6" />
+                        </Grid>
+                    </Border>
+
+                    <!-- 标题 -->
+                    <Border Margin="0,0,0,16" CornerRadius="8" Padding="16"
+                            Background="{DynamicResource MaterialDesignCardBackground}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"
+                                        Margin="0,0,16,0">
+                                <materialDesign:PackIcon Kind="FormatTitle" VerticalAlignment="Center" Margin="0,0,8,0"
+                                                         Foreground="{DynamicResource MaterialDesignPrimary}" />
+                                <TextBlock Text="标题" FontWeight="Medium" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="编辑模式下标题不可修改"
+                                           Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
+                                           FontSize="12"
+                                           Margin="0,0,0,8"
+                                           Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                <TextBox Text="{Binding TaskTitle, UpdateSourceTrigger=PropertyChanged}"
+                                         IsReadOnly="{Binding IsEditMode}"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Padding="8,6"
+                                         materialDesign:HintAssist.Hint="输入任务标题（用于文件夹命名）" />
+                                <TextBlock Text="请避免使用以下特殊字符：\ / : * ? &quot; &lt; &gt; |"
+                                           Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
+                                           FontSize="11"
+                                           Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- 描述 -->
+                    <Border Margin="0,0,0,16" CornerRadius="8" Padding="16"
+                            Background="{DynamicResource MaterialDesignCardBackground}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Top"
+                                        Margin="0,0,16,0">
+                                <materialDesign:PackIcon Kind="Text" VerticalAlignment="Center" Margin="0,0,8,0"
+                                                         Foreground="{DynamicResource MaterialDesignPrimary}" />
+                                <TextBlock Text="描述" FontWeight="Medium" />
+                            </StackPanel>
+                            <TextBox Grid.Column="1"
+                                     Text="{Binding TaskDescription}"
+                                     Height="80"
+                                     AcceptsReturn="True"
+                                     TextWrapping="Wrap"
+                                     VerticalScrollBarVisibility="Auto"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Padding="8,6"
+                                     materialDesign:HintAssist.Hint="输入任务描述..." />
+                            <CheckBox Grid.Column="2"
+                                      Content="接口公开"
+                                      IsChecked="{Binding ShowDescriptionInApi, Mode=TwoWay}"
+                                      Style="{StaticResource MaterialDesignCheckBox}"
+                                      VerticalAlignment="Top"
+                                      Margin="16,0,0,0"
+                                      ToolTip="勾选后，描述文本将在API响应中返回；否则返回null" />
+                        </Grid>
+                    </Border>
+
+                    <!-- 任务类型 -->
+                    <Border Margin="0,0,0,16" CornerRadius="8" Padding="16"
+                            Background="{DynamicResource MaterialDesignCardBackground}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <materialDesign:PackIcon Kind="FormatListBulletedType" VerticalAlignment="Center"
+                                                         Margin="0,0,8,0"
+                                                         Foreground="{DynamicResource MaterialDesignPrimary}" />
+                                <TextBlock Text="任务类型" FontWeight="Medium" FontSize="15" />
+                            </StackPanel>
+
+                            <TextBlock Text="编辑模式下任务类型不可修改"
+                                       Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
+                                       FontSize="12"
+                                       Margin="0,0,0,8"
+                                       Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                            <RadioButton Content="文件收集（用户上传 Excel 文件）"
+                                         GroupName="TaskType"
+                                         IsChecked="{Binding TaskType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=FileCollection}"
+                                         IsEnabled="{Binding IsEditMode, Converter={StaticResource InverseBooleanConverter}}"
+                                         Style="{StaticResource MaterialDesignRadioButton}"
+                                         Margin="0,0,0,8" />
+
+                            <RadioButton Content="在线填表（用户在网页端填写表单）"
+                                         GroupName="TaskType"
+                                         IsChecked="{Binding TaskType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=DataCollection}"
+                                         IsEnabled="{Binding IsEditMode, Converter={StaticResource InverseBooleanConverter}}"
+                                         Style="{StaticResource MaterialDesignRadioButton}" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 模板文件（所有任务类型都需要） -->
+                    <Border x:Name="TemplateFileBorder" Margin="0,0,0,16" CornerRadius="8" Padding="16"
+                            Background="{DynamicResource MaterialDesignCardBackground}"
+                            AllowDrop="True"
+                            PreviewDragEnter="TemplateFileBorder_PreviewDragEnter"
+                            PreviewDragOver="TemplateFileBorder_PreviewDragOver"
+                            PreviewDragLeave="TemplateFileBorder_PreviewDragLeave"
+                            PreviewDrop="TemplateFileBorder_PreviewDrop">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"
+                                        Margin="0,0,16,0">
+                                <materialDesign:PackIcon Kind="FileExcel" VerticalAlignment="Center"
+                                                         Margin="0,0,8,0"
+                                                         Foreground="{DynamicResource MaterialDesignPrimary}" />
+                                <TextBlock Text="模板文件" FontWeight="Medium" />
+                            </StackPanel>
+                            <Grid Grid.Column="1">
+                                <TextBox Text="{Binding TemplatePath}"
+                                         IsReadOnly="True"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Padding="8,6,36,6"
+                                         materialDesign:HintAssist.Hint="{Binding TemplatePathHint}" />
+                                <Button HorizontalAlignment="Right"
+                                        VerticalAlignment="Center"
+                                        Command="{Binding ClearTemplatePathCommand}"
+                                        Style="{StaticResource MaterialDesignIconForegroundButton}"
+                                        Width="28"
+                                        Height="28"
+                                        Margin="0,0,8,0"
+                                        Padding="0"
+                                        ToolTip="清空模板路径"
+                                        Visibility="{Binding TemplatePath, Converter={StaticResource NullToVisibilityConverter}}">
+                                    <materialDesign:PackIcon Kind="Close" Width="14" Height="14" />
+                                </Button>
+                                <TextBlock Text="拖拽文件到此处"
+                                           Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                           FontSize="12"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Opacity="0.5"
+                                           Visibility="{Binding TemplatePath, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                                           IsHitTestVisible="False" />
+                            </Grid>
+                            <Button Grid.Column="2"
+                                    Command="{Binding SelectTemplateFileCommand}"
+                                    Style="{StaticResource MaterialDesignOutlinedButton}"
+                                    Margin="8,0,0,0"
+                                    Height="36"
+                                    Padding="16,0">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="FolderOpen" Margin="0,0,6,0"
+                                                                 VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding SelectButtonLabel}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <!-- 文件存储位置预览 -->
+                    <Border Margin="0,0,0,16" CornerRadius="8" Padding="16"
+                            Background="{DynamicResource MaterialDesignCardBackground}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <materialDesign:PackIcon Kind="FolderOpen" VerticalAlignment="Center"
+                                                         Margin="0,0,8,0"
+                                                         Foreground="{DynamicResource MaterialDesignPrimary}" />
+                                <TextBlock Text="文件存储位置" FontWeight="Medium" FontSize="15" />
+                            </StackPanel>
+
+                            <StackPanel Margin="0,0,0,8">
+                                <TextBlock Text="配置路径：" FontSize="13" Margin="0,0,0,4" />
+                                <TextBox Text="{Binding ConfigPathPreview, Mode=OneWay}"
+                                         IsReadOnly="True"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Padding="8,6"
+                                         FontSize="12" />
+                            </StackPanel>
+
+                            <StackPanel>
+                                <TextBlock Text="收集路径：" FontSize="13" Margin="0,0,0,4" />
+                                <TextBox Text="{Binding CollectionPathPreview, Mode=OneWay}"
+                                         IsReadOnly="True"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Padding="8,6"
+                                         FontSize="12" />
+                            </StackPanel>
+
+                            <TextBlock Text="注意：文件将自动保存到上述位置"
+                                       Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                       FontSize="12"
+                                       Margin="0,8,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 在线填表配置 -->
+                    <Border Margin="0,0,0,16" CornerRadius="8" Padding="16"
+                            Background="{DynamicResource MaterialDesignCardBackground}"
+                            Visibility="{Binding IsDataCollection, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <materialDesign:PackIcon Kind="Table" VerticalAlignment="Center" Margin="0,0,8,0"
+                                                         Foreground="{DynamicResource MaterialDesignPrimary}" />
+                                <TextBlock Text="表格结构定义" FontWeight="Medium" FontSize="15" />
+                            </StackPanel>
+
+                            <!-- 列定义 ItemsControl -->
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="200" Margin="0,8,0,0">
+                                <ItemsControl ItemsSource="{Binding ColumnDefinitions}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border
+                                                BorderBrush="{DynamicResource MaterialDesignOutlineBorder}"
+                                                BorderThickness="1"
+                                                CornerRadius="4"
+                                                Padding="8"
+                                                Margin="0,0,0,8"
+                                                Background="{DynamicResource MaterialDesignCardBackground}">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!-- 上移/下移按钮 -->
+                                                    <StackPanel Grid.Column="0" Orientation="Vertical"
+                                                                Margin="0,0,12,0"
+                                                                VerticalAlignment="Center">
+                                                        <Button
+                                                            Command="{Binding DataContext.MoveColumnUpCommand,
+                                                                    RelativeSource={RelativeSource AncestorType=Window}}"
+                                                            CommandParameter="{Binding}"
+                                                            Style="{StaticResource MaterialDesignIconForegroundButton}"
+                                                            Width="24"
+                                                            Height="24"
+                                                            Padding="0"
+                                                            ToolTip="上移"
+                                                            Margin="0,0,0,4">
+                                                            <materialDesign:PackIcon Kind="ArrowUp"
+                                                                    Width="16"
+                                                                    Height="16" />
+                                                        </Button>
+                                                        <Button
+                                                            Command="{Binding DataContext.MoveColumnDownCommand,
+                                                                    RelativeSource={RelativeSource AncestorType=Window}}"
+                                                            CommandParameter="{Binding}"
+                                                            Style="{StaticResource MaterialDesignIconForegroundButton}"
+                                                            Width="24"
+                                                            Height="24"
+                                                            Padding="0"
+                                                            ToolTip="下移">
+                                                            <materialDesign:PackIcon Kind="ArrowDown"
+                                                                    Width="16"
+                                                                    Height="16" />
+                                                        </Button>
+                                                    </StackPanel>
+
+                                                    <!-- 列名、类型、必填 -->
+                                                    <Grid Grid.Column="1" VerticalAlignment="Center">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="120" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <!-- 列名 -->
+                                                        <TextBox Grid.Column="0"
+                                                                 Text="{Binding Name, UpdateSourceTrigger=LostFocus}"
+                                                                 Margin="0,0,8,0"
+                                                                 FontSize="13"
+                                                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                                                 materialDesign:HintAssist.Hint="列名"
+                                                                 Padding="6,8" />
+
+                                                        <!-- 类型 -->
+                                                        <ComboBox Grid.Column="1"
+                                                                  SelectedItem="{Binding Type}"
+                                                                  Margin="0,0,8,0"
+                                                                  FontSize="13"
+                                                                  Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                                                  materialDesign:HintAssist.Hint="类型"
+                                                                  Padding="6,8">
+                                                            <ComboBox.ItemsSource>
+                                                                <Binding
+                                                                    RelativeSource="{RelativeSource AncestorType=Window}"
+                                                                    Path="DataContext.ColumnTypes" />
+                                                            </ComboBox.ItemsSource>
+                                                        </ComboBox>
+
+                                                        <!-- 必填 -->
+                                                        <CheckBox Grid.Column="2"
+                                                                  IsChecked="{Binding Required}"
+                                                                  Content="必填"
+                                                                  VerticalAlignment="Center"
+                                                                  Style="{StaticResource MaterialDesignCheckBox}"
+                                                                  Margin="0,0,8,0" />
+                                                    </Grid>
+
+                                                    <!-- 删除按钮 -->
+                                                    <Button Grid.Column="2"
+                                                            Command="{Binding DataContext.RemoveColumnCommand,
+                                                                RelativeSource={RelativeSource AncestorType=Window}}"
+                                                            CommandParameter="{Binding}"
+                                                            Style="{StaticResource MaterialDesignOutlinedButton}"
+                                                            Width="60"
+                                                            Height="32"
+                                                            Padding="0"
+                                                            Margin="12,0,0,0">
+                                                        <materialDesign:PackIcon Kind="Delete"
+                                                                Width="16"
+                                                                Height="16" />
+                                                    </Button>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+
+                            <!-- 操作按钮 -->
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                <Button Command="{Binding AddColumnCommand}"
+                                        Style="{StaticResource MaterialDesignOutlinedButton}"
+                                        Height="36"
+                                        Padding="16,0">
+                                    <Button.Content>
+                                        <StackPanel Orientation="Horizontal">
+                                            <materialDesign:PackIcon Kind="Plus" Margin="0,0,6,0"
+                                                                     VerticalAlignment="Center" />
+                                            <TextBlock Text="添加列" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Button.Content>
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 附件上传配置 -->
+                    <Border Margin="0,0,0,16" CornerRadius="8" Padding="16"
+                            Background="{DynamicResource MaterialDesignCardBackground}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <materialDesign:PackIcon Kind="Attachment" VerticalAlignment="Center" Margin="0,0,8,0"
+                                                         Foreground="{DynamicResource MaterialDesignPrimary}" />
+                                <TextBlock Text="附件配置" FontWeight="Medium" FontSize="15" />
+                            </StackPanel>
+
+                            <!-- 附件上传开关 -->
+                            <CheckBox Content="允许用户上传附件"
+                                      IsChecked="{Binding AllowAttachmentUpload, Mode=TwoWay}"
+                                      Style="{StaticResource MaterialDesignCheckBox}"
+                                      Margin="0,0,0,8" />
+
+                            <!-- 扩展名配置区域（仅在启用时显示） -->
+                            <StackPanel
+                                Visibility="{Binding AllowAttachmentUpload, Converter={StaticResource BoolToVisibilityConverter}}"
+                                Margin="0,16,0,0">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,12">
+                                    <materialDesign:PackIcon Kind="FileEditOutline" VerticalAlignment="Center"
+                                                             Margin="0,0,8,0"
+                                                             Foreground="{DynamicResource MaterialDesignPrimary}" />
+                                    <TextBlock Text="允许上传的文件类型" FontWeight="Medium" FontSize="15" />
+                                </StackPanel>
+
+                                <!-- 自定义后缀输入框 -->
+                                <Grid Margin="0,0,0,12">
+                                    <TextBox Text="{Binding CustomExtensionInput, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                             materialDesign:HintAssist.Hint="自定义后缀（如 .abc）"
+                                             KeyDown="CustomExtensionInput_KeyDown" />
+                                    <Button Content="+"
+                                            Command="{Binding AddCustomExtensionCommand}"
+                                            Style="{StaticResource MaterialDesignRaisedButton}"
+                                            Width="40"
+                                            Height="36"
+                                            HorizontalAlignment="Right"
+                                            Margin="0,0,8,0" />
+                                </Grid>
+
+                                <!-- 分类选择 + 操作按钮 -->
+                                <Grid Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <ComboBox Grid.Column="0"
+                                              ItemsSource="{Binding ExtensionCategories}"
+                                              SelectedItem="{Binding SelectedCategoryFilter}"
+                                              Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                              materialDesign:HintAssist.Hint="选择分类"
+                                              Margin="0,0,8,0">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding}" />
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+
+                                    <Button Grid.Column="1"
+                                            Content="全选"
+                                            Command="{Binding SelectAllExtensionsCommand}"
+                                            Style="{StaticResource MaterialDesignOutlinedButton}"
+                                            Margin="0,0,8,0" />
+
+                                    <Button Grid.Column="2"
+                                            Content="反选"
+                                            Command="{Binding InvertSelectionCommand}"
+                                            Style="{StaticResource MaterialDesignOutlinedButton}" />
+                                </Grid>
+
+                                <!-- 扩展名列表 -->
+                                <ScrollViewer MaxHeight="200" VerticalScrollBarVisibility="Auto" Margin="0,0,0,12">
+                                    <ItemsControl ItemsSource="{Binding FilteredExtensions}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <CheckBox Content="{Binding DisplayName}"
+                                                          IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                          Margin="4,2"
+                                                          Style="{StaticResource MaterialDesignCheckBox}">
+                                                    <CheckBox.ToolTip>
+                                                        <TextBlock Text="{Binding Extension}" />
+                                                    </CheckBox.ToolTip>
+                                                </CheckBox>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                    </ItemsControl>
+                                </ScrollViewer>
+
+                                <!-- 已选择的扩展名数量 -->
+                                <TextBlock Text="{Binding SelectedExtensionsCount, StringFormat='已选择 {0} 种文件类型'}"
+                                           Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                           FontSize="12" />
+                            </StackPanel>
+
+                            <!-- 任务附件下载区域 -->
+                            <Border Margin="0,16,0,0" CornerRadius="6" Padding="12"
+                                    Background="{DynamicResource MaterialDesignCardBackground}"
+                                    Visibility="{Binding ShowTaskAttachments, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                        <materialDesign:PackIcon Kind="Download" VerticalAlignment="Center"
+                                                                 Margin="0,0,8,0"
+                                                                 Foreground="{DynamicResource MaterialDesignPrimary}" />
+                                        <TextBlock Text="任务附件（供用户下载）" FontWeight="Medium" FontSize="13" />
+                                    </StackPanel>
+
+                                    <!-- 操作按钮 -->
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                        <Button Command="{Binding AddAttachmentCommand}"
+                                                Style="{StaticResource MaterialDesignOutlinedButton}"
+                                                HorizontalAlignment="Left"
+                                                Height="32"
+                                                Padding="12,0"
+                                                Margin="0,0,8,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <materialDesign:PackIcon Kind="Plus" Margin="0,0,6,0"
+                                                                         VerticalAlignment="Center" />
+                                                <TextBlock Text="添加附件" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Button>
+                                        <Button Command="{Binding ClearAllAttachmentsCommand}"
+                                                Style="{StaticResource MaterialDesignOutlinedButton}"
+                                                HorizontalAlignment="Left"
+                                                Height="32"
+                                                Padding="12,0"
+                                                Margin="0,0,8,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <materialDesign:PackIcon Kind="Delete" Margin="0,0,6,0"
+                                                                         VerticalAlignment="Center" />
+                                                <TextBlock Text="清空附件" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Button>
+                                        <TextBlock Text="{Binding TaskAttachments.Count, StringFormat='共 {0} 个附件'}"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource MaterialDesignBodyLight}" />
+                                    </StackPanel>
+
+                                    <!-- 下载提示（任务级别） -->
+                                    <TextBox
+                                        Text="{Binding AttachmentDownloadDescription, UpdateSourceTrigger=LostFocus}"
+                                        FontSize="13"
+                                        Margin="0,0,0,12"
+                                        AcceptsReturn="True"
+                                        TextWrapping="Wrap"
+                                        Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                        materialDesign:HintAssist.Hint="下载提示（可选，未填则显示默认提示）"
+                                        Padding="8,10"
+                                        Height="60"
+                                        VerticalContentAlignment="Top" />
+
+                                    <!-- 附件列表 -->
+                                    <Border x:Name="AttachmentListBorder"
+                                            BorderBrush="{DynamicResource MaterialDesignDivider}"
+                                            BorderThickness="1"
+                                            CornerRadius="4"
+                                            Padding="8"
+                                            MinHeight="100"
+                                            Background="{DynamicResource MaterialDesignCardBackground}"
+                                            AllowDrop="True"
+                                            PreviewDragEnter="AttachmentListBorder_PreviewDragEnter"
+                                            PreviewDragOver="AttachmentListBorder_PreviewDragOver"
+                                            PreviewDragLeave="AttachmentListBorder_PreviewDragLeave"
+                                            PreviewDrop="AttachmentListBorder_PreviewDrop">
+                                        <Grid>
+                                            <!-- 空状态提示 -->
+                                            <TextBlock Text="拖拽文件到此处或点击上方按钮添加附件"
+                                                       Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                                       FontSize="12"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"
+                                                       Opacity="0.5"
+                                                       Visibility="{Binding TaskAttachments.Count, Converter={StaticResource IntToVisibilityConverter}, ConverterParameter=0}"
+                                                       IsHitTestVisible="False" />
+
+                                            <!-- 附件列表 -->
+                                            <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="300">
+                                                <ItemsControl ItemsSource="{Binding TaskAttachments}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Border
+                                                                BorderBrush="{DynamicResource MaterialDesignOutlineBorder}"
+                                                                BorderThickness="0,0,0,1"
+                                                                CornerRadius="4"
+                                                                Padding="8,8,8,8"
+                                                                Margin="0,0,0,8"
+                                                                Background="{DynamicResource MaterialDesignCardBackground}">
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="Auto" />
+                                                                        <ColumnDefinition Width="*" />
+                                                                        <ColumnDefinition Width="Auto" />
+                                                                    </Grid.ColumnDefinitions>
+
+                                                                    <!-- 上移/下移按钮 -->
+                                                                    <StackPanel Grid.Column="0" Orientation="Vertical"
+                                                                            Margin="0,0,12,0"
+                                                                            VerticalAlignment="Center">
+                                                                        <Button
+                                                                            Command="{Binding DataContext.MoveAttachmentUpCommand,
+                                                                                    RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                            CommandParameter="{Binding}"
+                                                                            Style="{StaticResource MaterialDesignIconForegroundButton}"
+                                                                            Width="24"
+                                                                            Height="24"
+                                                                            Padding="0"
+                                                                            ToolTip="上移"
+                                                                            Margin="0,0,0,4">
+                                                                            <materialDesign:PackIcon Kind="ArrowUp"
+                                                                                    Width="16"
+                                                                                    Height="16" />
+                                                                        </Button>
+                                                                        <Button
+                                                                            Command="{Binding DataContext.MoveAttachmentDownCommand,
+                                                                                    RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                            CommandParameter="{Binding}"
+                                                                            Style="{StaticResource MaterialDesignIconForegroundButton}"
+                                                                            Width="24"
+                                                                            Height="24"
+                                                                            Padding="0"
+                                                                            ToolTip="下移">
+                                                                            <materialDesign:PackIcon Kind="ArrowDown"
+                                                                                    Width="16"
+                                                                                    Height="16" />
+                                                                        </Button>
+                                                                    </StackPanel>
+
+                                                                    <!-- 文件名和显示名称 -->
+                                                                    <StackPanel Grid.Column="1"
+                                                                            VerticalAlignment="Center">
+                                                                        <TextBlock Text="{Binding FileName}"
+                                                                                FontWeight="SemiBold"
+                                                                                FontSize="14" />
+                                                                        <TextBox
+                                                                            Text="{Binding DisplayName, UpdateSourceTrigger=LostFocus}"
+                                                                            Margin="0,4,0,0"
+                                                                            FontSize="12"
+                                                                            Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                                                            materialDesign:HintAssist.Hint="显示名称（可选）"
+                                                                            Padding="4,6" />
+                                                                    </StackPanel>
+
+                                                                    <!-- 删除按钮和文件大小 -->
+                                                                    <StackPanel Grid.Column="2" Orientation="Vertical"
+                                                                            Margin="12,0,0,0"
+                                                                            VerticalAlignment="Center">
+                                                                        <TextBlock
+                                                                            Text="{Binding FileSize, Converter={StaticResource FileSizeConverter}}"
+                                                                            Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                                                            FontSize="11"
+                                                                            HorizontalAlignment="Center"
+                                                                            Margin="0,0,0,8" />
+                                                                        <Button
+                                                                            Command="{Binding DataContext.RemoveAttachmentCommand,
+                                                                                    RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                            CommandParameter="{Binding}"
+                                                                            Style="{StaticResource MaterialDesignOutlinedButton}"
+                                                                            Width="60"
+                                                                            Height="28"
+                                                                            Padding="0">
+                                                                            <TextBlock Text="删除" FontSize="12" />
+                                                                        </Button>
+                                                                    </StackPanel>
+                                                                </Grid>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </ScrollViewer>
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 访问控制 -->
+                    <Border Margin="0,0,0,16" CornerRadius="8" Padding="16"
+                            Background="{DynamicResource MaterialDesignCardBackground}">
+                        <StackPanel>
+                            <TextBlock Text="访问控制" FontWeight="Medium" FontSize="15" Margin="0,0,0,12"
+                                       Foreground="{DynamicResource MaterialDesignPrimary}" />
+
+                            <!-- 密码 -->
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"
+                                            Margin="0,0,16,0">
+                                    <materialDesign:PackIcon Kind="Lock" VerticalAlignment="Center" Margin="0,0,8,0"
+                                                             Foreground="{DynamicResource MaterialDesignPrimary}" />
+                                    <TextBlock Text="访问密码" FontWeight="Medium" />
+                                </StackPanel>
+                                <PasswordBox Grid.Column="1"
+                                             x:Name="PasswordBox"
+                                             PasswordChanged="PasswordBox_PasswordChanged"
+                                             IsEnabled="{Binding RequirePassword}"
+                                             Style="{StaticResource MaterialDesignOutlinedPasswordBox}"
+                                             Padding="8,6"
+                                             materialDesign:HintAssist.Hint="输入访问密码" />
+                                <CheckBox Grid.Column="2"
+                                          Content="启用密码"
+                                          IsChecked="{Binding RequirePassword}"
+                                          Style="{StaticResource MaterialDesignCheckBox}"
+                                          VerticalAlignment="Center"
+                                          Margin="8,0,0,0" />
+                            </Grid>
+
+                            <!-- 提交上限 -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"
+                                            Margin="0,0,16,0">
+                                    <materialDesign:PackIcon Kind="Numeric" VerticalAlignment="Center" Margin="0,0,8,0"
+                                                             Foreground="{DynamicResource MaterialDesignPrimary}" />
+                                    <TextBlock Text="提交上限" FontWeight="Medium" />
+                                </StackPanel>
+                                <TextBox Grid.Column="1"
+                                         Text="{Binding MaxLimit}"
+                                         Width="100"
+                                         PreviewTextInput="Number_PreviewTextInput"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Padding="8,6"
+                                         materialDesign:HintAssist.Hint="0 表示不限制"
+                                         TextAlignment="Center" />
+                                <TextBlock Grid.Column="2"
+                                           Text="0 表示不限制"
+                                           VerticalAlignment="Center"
+                                           Margin="12,0,0,0"
+                                           Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                           FontSize="12" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 过期时间 -->
+                    <Border Margin="0,0,0,16" CornerRadius="8" Padding="16"
+                            Background="{DynamicResource MaterialDesignCardBackground}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <materialDesign:PackIcon Kind="Clock" VerticalAlignment="Center" Margin="0,0,8,0"
+                                                         Foreground="{DynamicResource MaterialDesignPrimary}" />
+                                <TextBlock Text="过期时间" FontWeight="Medium" FontSize="15" />
+                            </StackPanel>
+
+                            <CheckBox Content="长期任务（不设置过期时间）"
+                                      IsChecked="{Binding IsLongTermTask}"
+                                      Style="{StaticResource MaterialDesignCheckBox}"
+                                      Margin="0,0,0,12" />
+
+                            <!-- 日期选择 -->
+                            <Grid
+                                IsEnabled="{Binding IsLongTermTask, Converter={StaticResource InverseBooleanConverter}}"
+                                Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="日期" VerticalAlignment="Center" Margin="0,0,16,0"
+                                           Foreground="{DynamicResource MaterialDesignBodyLight}" Width="60" />
+                                <DatePicker Grid.Column="1"
+                                            SelectedDate="{Binding ExpiryDate}"
+                                            Style="{StaticResource MaterialDesignOutlinedDatePicker}" />
+                            </Grid>
+
+                            <!-- 时间选择 -->
+                            <Grid
+                                IsEnabled="{Binding IsLongTermTask, Converter={StaticResource InverseBooleanConverter}}"
+                                Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="70" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="70" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="70" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="时间" VerticalAlignment="Center" Margin="0,0,16,0"
+                                           Foreground="{DynamicResource MaterialDesignBodyLight}" Width="60" />
+                                <TextBox Grid.Column="1" Name="HourBox"
+                                         Text="{Binding Hour, StringFormat='{}{0:D2}', Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                         MaxLength="2" PreviewTextInput="Number_PreviewTextInput"
+                                         LostFocus="TimeBox_LostFocus"
+                                         ToolTip="小时 (0-23)" TextAlignment="Center"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Padding="8,6"
+                                         materialDesign:TextFieldAssist.CharacterCounterVisibility="Collapsed" />
+                                <TextBlock Grid.Column="2" Text=":" VerticalAlignment="Center" Margin="8,0"
+                                           Foreground="{DynamicResource MaterialDesignBody}" />
+                                <TextBox Grid.Column="3" Name="MinuteBox"
+                                         Text="{Binding Minute, StringFormat='{}{0:D2}', Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                         MaxLength="2" PreviewTextInput="Number_PreviewTextInput"
+                                         LostFocus="TimeBox_LostFocus"
+                                         ToolTip="分钟 (0-59)" TextAlignment="Center"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Padding="8,6"
+                                         materialDesign:TextFieldAssist.CharacterCounterVisibility="Collapsed" />
+                                <TextBlock Grid.Column="4" Text=":" VerticalAlignment="Center" Margin="8,0"
+                                           Foreground="{DynamicResource MaterialDesignBody}" />
+                                <TextBox Grid.Column="5" Name="SecondBox"
+                                         Text="{Binding Second, StringFormat='{}{0:D2}', Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                         MaxLength="2" PreviewTextInput="Number_PreviewTextInput"
+                                         LostFocus="TimeBox_LostFocus"
+                                         ToolTip="秒 (0-59)" TextAlignment="Center"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Padding="8,6"
+                                         materialDesign:TextFieldAssist.CharacterCounterVisibility="Collapsed" />
+                            </Grid>
+
+                            <!-- 快捷设置 -->
+                            <Grid
+                                IsEnabled="{Binding IsLongTermTask, Converter={StaticResource InverseBooleanConverter}}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="快捷设置" VerticalAlignment="Center" Margin="0,0,16,0"
+                                           Foreground="{DynamicResource MaterialDesignBodyLight}" Width="60" />
+                                <ComboBox Grid.Column="1"
+                                          ItemsSource="{Binding ExpiryQuickOptions}"
+                                          SelectedItem="{Binding SelectedExpiryQuickOption}"
+                                          DisplayMemberPath="DisplayName"
+                                          IsEditable="False"
+                                          Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                          materialDesign:HintAssist.Hint="选择快捷时间"
+                                          Padding="8,6" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 选项 -->
+                    <Border Margin="0,0,0,16" CornerRadius="8" Padding="16"
+                            Background="{DynamicResource MaterialDesignCardBackground}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <materialDesign:PackIcon Kind="Tune" VerticalAlignment="Center" Margin="0,0,8,0"
+                                                         Foreground="{DynamicResource MaterialDesignPrimary}" />
+                                <TextBlock Text="任务选项" FontWeight="Medium" FontSize="15" />
+                            </StackPanel>
+
+                            <CheckBox Content="一次性下载链接（下载后失效）"
+                                      IsChecked="{Binding IsOneTimeLink}"
+                                      Style="{StaticResource MaterialDesignCheckBox}"
+                                      Margin="0,0,0,8" />
+
+                            <Grid
+                                Visibility="{Binding IsOneTimeLink, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0"
+                                           Text="{Binding DownloadsCount, StringFormat='已下载 {0} 次'}"
+                                           VerticalAlignment="Center"
+                                           Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                           FontSize="13"
+                                           Margin="0,0,0,8" />
+                                <Button Grid.Column="1"
+                                        Command="{Binding ResetDownloadsCountCommand}"
+                                        Style="{StaticResource MaterialDesignOutlinedButton}"
+                                        Height="28"
+                                        Padding="12,0"
+                                        Margin="8,0,0,8"
+                                        FontSize="12"
+                                        ToolTip="重置下载次数，允许用户再次下载">
+                                    <Button.Content>
+                                        <StackPanel Orientation="Horizontal">
+                                            <materialDesign:PackIcon Kind="Refresh" Margin="0,0,4,0"
+                                                                     VerticalAlignment="Center" FontSize="12" />
+                                            <TextBlock Text="重置" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Button.Content>
+                                </Button>
+                            </Grid>
+
+                            <CheckBox Content="任务激活"
+                                      IsChecked="{Binding IsActive}"
+                                      Style="{StaticResource MaterialDesignCheckBox}" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 文件重名处理 -->
+                    <Border Margin="0,0,0,16" CornerRadius="8" Padding="16"
+                            Background="{DynamicResource MaterialDesignCardBackground}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <materialDesign:PackIcon Kind="FileReplace" VerticalAlignment="Center" Margin="0,0,8,0"
+                                                         Foreground="{DynamicResource MaterialDesignPrimary}" />
+                                <TextBlock Text="文件重名处理" FontWeight="Medium" FontSize="15" />
+                            </StackPanel>
+
+                            <RadioButton Content="保留版本（自动添加 _v1, _v2 后缀）"
+                                         IsChecked="{Binding VersioningMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=AutoVersion}"
+                                         Style="{StaticResource MaterialDesignRadioButton}"
+                                         Margin="0,0,0,8" />
+
+                            <RadioButton Content="覆盖模式（删除同名旧文件）"
+                                         IsChecked="{Binding VersioningMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Overwrite}"
+                                         Style="{StaticResource MaterialDesignRadioButton}" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 下载链接 -->
+                    <Border Margin="0,0,0,16" CornerRadius="8" Padding="16"
+                            Background="{DynamicResource MaterialDesignCardBackground}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <materialDesign:PackIcon Kind="Link" VerticalAlignment="Center" Margin="0,0,8,0"
+                                                         Foreground="{DynamicResource MaterialDesignPrimary}" />
+                                <TextBlock Text="下载链接" FontWeight="Medium" FontSize="15" />
+                            </StackPanel>
+
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0"
+                                         Text="{Binding GeneratedLink}"
+                                         IsReadOnly="True"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Padding="8,6"
+                                         materialDesign:HintAssist.Hint="下载链接将显示在这里"
+                                         FontFamily="Consolas, Courier New" />
+                                <Button Grid.Column="1"
+                                        Command="{Binding CopyLinkToClipboardCommand}"
+                                        Style="{StaticResource MaterialDesignIconButton}"
+                                        Height="36"
+                                        Width="36"
+                                        Margin="8,0,0,0"
+                                        ToolTip="复制链接">
+                                    <materialDesign:PackIcon Kind="ContentCopy" />
+                                </Button>
+                            </Grid>
+
+                            <Button Command="{Binding GenerateDownloadLinkCommand}"
+                                    Style="{StaticResource MaterialDesignRaisedButton}"
+                                    Height="36"
+                                    Padding="16,0">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="LinkVariant" Margin="0,0,6,0"
+                                                                 VerticalAlignment="Center" />
+                                        <TextBlock Text="生成链接" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- 底部按钮 -->
+            <Border Grid.Row="2" Padding="16,8,16,16"
+                    Background="{DynamicResource MaterialDesignCardBackground}">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Command="{Binding CancelCommand}"
+                            Style="{StaticResource MaterialDesignOutlinedButton}"
+                            Height="36"
+                            Padding="24,0"
+                            Margin="0,0,12,0">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Cancel" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                <TextBlock Text="取消" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <Button Command="{Binding SaveAsCommand}"
+                            Style="{StaticResource MaterialDesignOutlinedButton}"
+                            Height="36"
+                            Padding="24,0"
+                            Margin="0,0,12,0"
+                            Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Button.ToolTip>
+                            <ToolTip Content="复制当前任务为新的独立任务" />
+                        </Button.ToolTip>
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="ContentCopy" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                <TextBlock Text="另存为" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <Button Command="{Binding SaveAndCloseCommand}"
+                            Style="{StaticResource MaterialDesignRaisedButton}"
+                            Height="36"
+                            Padding="24,0">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Check" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                <TextBlock Text="保存" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </materialDesign:Card>
+</Window>

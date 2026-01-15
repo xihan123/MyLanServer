@@ -1,0 +1,40 @@
+﻿<Application x:Class="MyLanServer.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:converters="clr-namespace:MyLanServer.UI.Converters"
+             ShutdownMode="OnMainWindowClose">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- 引入 Material Design 3 默认样式 -->
+                <ResourceDictionary
+                    Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
+
+                <materialDesign:BundledTheme BaseTheme="Light"
+                                             PrimaryColor="Indigo"
+                                             SecondaryColor="Blue">
+                    <materialDesign:BundledTheme.ColorAdjustment>
+                        <materialDesign:ColorAdjustment />
+                    </materialDesign:BundledTheme.ColorAdjustment>
+                </materialDesign:BundledTheme>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- =========================== -->
+            <!-- 自定义资源与转换器 -->
+            <!-- =========================== -->
+            <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+            <converters:BoolToStringConverter x:Key="BoolToStringConverter" />
+            <converters:FileSizeConverter x:Key="FileSizeConverter" />
+            <converters:ConditionToVisibilityConverter x:Key="BoolToVisibilityConverter" Condition="IsTrue" />
+            <converters:ConditionToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" Condition="IsTrue"
+                                                       TrueValue="Collapsed" FalseValue="Visible" />
+            <converters:ConditionToVisibilityConverter x:Key="NullToVisibilityConverter" Condition="IsNotNullOrEmpty" />
+            <converters:ConditionToVisibilityConverter x:Key="HasPasswordToVisibilityConverter"
+                                                       Condition="IsNotNullOrWhiteSpace" />
+            <converters:ConditionToVisibilityConverter x:Key="HasLimitToVisibilityConverter" Condition="GreaterThan" />
+            <converters:ConditionToVisibilityConverter x:Key="IntToVisibilityConverter" Condition="Equal" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

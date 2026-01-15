@@ -1,0 +1,69 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net9.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UseWPF>true</UseWPF>
+
+
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+        <PublishSingleFile>true</PublishSingleFile>
+        <SelfContained>false</SelfContained>
+        <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+        <EnableCompressionInSingleFile>false</EnableCompressionInSingleFile>
+        <StartupObject>MyLanServer.Program</StartupObject>
+
+        <!-- Enable embedded file provider for wwwroot -->
+        <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+        <Title>MyLanServer</Title>
+        <Authors>xihan123</Authors>
+        <Description>内网文件分发与收集工具</Description>
+        <Copyright>xihan123</Copyright>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- Core & DI -->
+        <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.2" />
+
+        <!-- UI (MVVM) -->
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0"/>
+
+        <!-- Material Design 3 -->
+        <PackageReference Include="MaterialDesignThemes" Version="5.3.0"/>
+        <PackageReference Include="MaterialDesignColors" Version="5.3.0"/>
+
+        <!-- Database -->
+        <PackageReference Include="Dapper" Version="2.1.66"/>
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.2" />
+        <PackageReference Include="Microsoft.NET.ILLink.Tasks" Version="10.0.2" />
+
+        <!-- Excel (High Performance) -->
+        <PackageReference Include="MiniExcel" Version="1.42.0"/>
+
+        <!-- Logging -->
+        <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0"/>
+        <PackageReference Include="Serilog.Sinks.File" Version="7.0.0"/>
+
+        <!-- Validation -->
+        <PackageReference Include="FluentValidation" Version="12.1.1"/>
+    </ItemGroup>
+
+    <!-- Essential to bring in ASP.NET Core runtime for a WPF app -->
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Include="wwwroot\**"/>
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="tests\downloads\" />
+      <Folder Include="tests\test_files\" />
+      <Folder Include="tests\test_reports\" />
+      <Folder Include="wwwroot\" />
+    </ItemGroup>
+
+</Project>

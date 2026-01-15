@@ -1,0 +1,14 @@
+# 在线填表功能测试脚本依赖库
+
+# HTTP 请求库
+requests
+aiohttp
+
+# 测试数据生成
+Faker
+
+# 文件生成库
+Pillow           # 图片处理
+reportlab        # PDF 生成
+python-docx      # Word 文档生成
+openpyxl         # Excel 文件生成

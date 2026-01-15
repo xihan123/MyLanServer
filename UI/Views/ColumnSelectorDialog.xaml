@@ -1,0 +1,165 @@
+<Window x:Class="MyLanServer.UI.Views.ColumnSelectorDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Style="{StaticResource MaterialDesignWindow}"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="14"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        Title="列设置" Height="600" Width="500"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="SingleBorderWindow"
+        ResizeMode="CanResizeWithGrip">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="46" ResizeBorderThickness="6" CornerRadius="0" GlassFrameThickness="0,0,0,1"
+                      UseAeroCaptionButtons="False" />
+    </WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <Style x:Key="WindowControlButtonStyle" TargetType="Button" BasedOn="{StaticResource MaterialDesignIconButton}">
+            <Setter Property="Width" Value="40" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+            <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+        </Style>
+
+        <Style x:Key="CloseButtonStyle" TargetType="Button" BasedOn="{StaticResource WindowControlButtonStyle}">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="White" />
+                    <Setter Property="Background" Value="#E81123" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- 标题栏 -->
+        <Grid Grid.Row="0" Height="46" Background="Transparent">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
+                <materialDesign:PackIcon Kind="ViewColumn" VerticalAlignment="Center" Margin="0,0,8,0"
+                                         Foreground="{DynamicResource MaterialDesignPrimary}" />
+                <TextBlock Text="列设置" VerticalAlignment="Center" FontWeight="Medium" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                <Button Style="{StaticResource CloseButtonStyle}" Click="CloseButton_Click" ToolTip="关闭">
+                    <materialDesign:PackIcon Kind="WindowClose" />
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- 主内容区 -->
+        <Grid Grid.Row="1" Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- 操作按钮 -->
+            <materialDesign:Card Grid.Row="0" Margin="0,0,0,8" Padding="12">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="全选"
+                            Command="{Binding SelectAllCommand}"
+                            Style="{StaticResource MaterialDesignOutlinedButton}"
+                            Margin="0,0,8,0"
+                            Width="100" />
+                    <Button Content="取消全选"
+                            Command="{Binding DeselectAllCommand}"
+                            Style="{StaticResource MaterialDesignOutlinedButton}"
+                            Margin="0,0,8,0"
+                            Width="100" />
+                    <Button Content="重置默认"
+                            Command="{Binding ResetToDefaultCommand}"
+                            Style="{StaticResource MaterialDesignOutlinedButton}"
+                            Width="100" />
+                </StackPanel>
+            </materialDesign:Card>
+
+            <!-- 列列表 -->
+            <materialDesign:Card Grid.Row="1">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding ColumnConfigs}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="{DynamicResource MaterialDesignDivider}"
+                                        BorderThickness="0,0,0,1"
+                                        Padding="12,8">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- 复选框 -->
+                                        <CheckBox Grid.Column="0"
+                                                  IsChecked="{Binding IsVisible, Mode=TwoWay}"
+                                                  VerticalAlignment="Center"
+                                                  Margin="0,0,16,0" />
+
+                                        <!-- 列名称 -->
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding Header}"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="14" />
+
+                                        <!-- 移动按钮 -->
+                                        <StackPanel Grid.Column="2"
+                                                    Orientation="Horizontal"
+                                                    VerticalAlignment="Center">
+                                            <Button
+                                                Command="{Binding DataContext.MoveUpCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
+                                                Style="{StaticResource MaterialDesignIconButton}"
+                                                ToolTip="上移"
+                                                Width="32"
+                                                Height="32"
+                                                Margin="0,0,4,0">
+                                                <materialDesign:PackIcon Kind="ArrowUp" />
+                                            </Button>
+                                            <Button
+                                                Command="{Binding DataContext.MoveDownCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
+                                                Style="{StaticResource MaterialDesignIconButton}"
+                                                ToolTip="下移"
+                                                Width="32"
+                                                Height="32">
+                                                <materialDesign:PackIcon Kind="ArrowDown" />
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </materialDesign:Card>
+        </Grid>
+
+        <!-- 底部按钮 -->
+        <Grid Grid.Row="2" Margin="16">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="取消"
+                        Command="{Binding CancelCommand}"
+                        Style="{StaticResource MaterialDesignOutlinedButton}"
+                        Margin="0,0,8,0"
+                        Width="100" />
+                <Button Content="确定"
+                        Command="{Binding ConfirmCommand}"
+                        Style="{StaticResource MaterialDesignRaisedButton}"
+                        Width="100" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

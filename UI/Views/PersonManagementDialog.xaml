@@ -1,0 +1,372 @@
+<Window x:Class="MyLanServer.UI.Views.PersonManagementDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Style="{StaticResource MaterialDesignWindow}"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="14"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        Title="人员管理" Height="800" Width="1200"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="SingleBorderWindow"
+        ResizeMode="CanResizeWithGrip">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="46" ResizeBorderThickness="6" CornerRadius="0" GlassFrameThickness="0,0,0,1"
+                      UseAeroCaptionButtons="False" />
+    </WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <Style x:Key="WindowControlButtonStyle" TargetType="Button" BasedOn="{StaticResource MaterialDesignIconButton}">
+            <Setter Property="Width" Value="40" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+            <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+        </Style>
+
+        <Style x:Key="CloseButtonStyle" TargetType="Button" BasedOn="{StaticResource WindowControlButtonStyle}">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="White" />
+                    <Setter Property="Background" Value="#E81123" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- 标题栏 -->
+        <Grid Grid.Row="0" Height="46" Background="Transparent">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
+                <materialDesign:PackIcon Kind="AccountMultiple" VerticalAlignment="Center" Margin="0,0,8,0"
+                                         Foreground="{DynamicResource MaterialDesignPrimary}" />
+                <TextBlock Text="人员管理" VerticalAlignment="Center" FontWeight="Medium" />
+                <TextBlock Text="(" VerticalAlignment="Center" FontWeight="Medium" />
+                <TextBlock Text="{Binding Persons.Count, Mode=OneWay}" VerticalAlignment="Center" FontWeight="Medium" />
+                <TextBlock Text=")" VerticalAlignment="Center" FontWeight="Medium" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                <Button Style="{StaticResource CloseButtonStyle}" Click="CloseButton_Click" ToolTip="关闭">
+                    <materialDesign:PackIcon Kind="WindowClose" />
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- 主内容区 -->
+        <Grid Grid.Row="1" Margin="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="320" />
+            </Grid.ColumnDefinitions>
+
+            <!-- 左侧：人员列表 -->
+            <Grid Grid.Column="0" Margin="0,0,8,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- 搜索框 -->
+                <materialDesign:Card Grid.Row="0"
+                                     Margin="0,0,0,8"
+                                     Padding="8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox Grid.Column="0"
+                                 materialDesign:HintAssist.Hint="搜索姓名、身份证号、联系方式..."
+                                 materialDesign:HintAssist.IsFloating="True"
+                                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 Margin="0,0,8,0">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Escape" Command="{Binding CancelEditCommand}" />
+                            </TextBox.InputBindings>
+                        </TextBox>
+
+                        <Button Grid.Column="1"
+                                Command="{Binding OpenColumnSelectorCommand}"
+                                Style="{StaticResource MaterialDesignIconButton}"
+                                ToolTip="列设置"
+                                Width="40"
+                                Height="40"
+                                VerticalAlignment="Center">
+                            <materialDesign:PackIcon Kind="ViewColumn" />
+                        </Button>
+                    </Grid>
+                </materialDesign:Card>
+
+                <!-- 人员列表 -->
+                <materialDesign:Card Grid.Row="1">
+                    <DataGrid x:Name="PersonDataGrid"
+                              ItemsSource="{Binding FilteredPersons}"
+                              SelectedItem="{Binding SelectedPerson}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              SelectionMode="Single"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              CanUserResizeColumns="True"
+                              CanUserReorderColumns="True"
+                              ColumnReordered="PersonDataGrid_ColumnReordered"
+                              AlternatingRowBackground="{DynamicResource MaterialDesignCardsBackground}"
+                              AlternationCount="2"
+                              materialDesign:DataGridAssist.CellPadding="8"
+                              materialDesign:DataGridAssist.ColumnHeaderPadding="8">
+                        <DataGrid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="编辑"
+                                          Command="{Binding Path=PlacementTarget.Tag.EditPersonCommand,
+                                                        RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                    <MenuItem.Icon>
+                                        <materialDesign:PackIcon Kind="Pencil" />
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Header="删除"
+                                          Command="{Binding Path=PlacementTarget.Tag.DeletePersonCommand,
+                                                        RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                    <MenuItem.Icon>
+                                        <materialDesign:PackIcon Kind="Delete" />
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
+                        <DataGrid.InputBindings>
+                            <KeyBinding Key="Delete" Command="{Binding DeletePersonCommand}" />
+                            <KeyBinding Key="Enter" Command="{Binding EditPersonCommand}" />
+                        </DataGrid.InputBindings>
+                    </DataGrid>
+                </materialDesign:Card>
+            </Grid>
+
+            <!-- 右侧：编辑面板 -->
+            <Grid Grid.Column="1" Margin="8,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- 操作按钮区域 -->
+                <materialDesign:Card Grid.Row="0" Margin="0,0,0,8" Padding="12">
+                    <StackPanel>
+                        <Button Command="{Binding AddPersonCommand}"
+                                Style="{StaticResource MaterialDesignRaisedButton}"
+                                HorizontalContentAlignment="Left"
+                                Margin="0,0,0,8">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="AccountPlus" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                <TextBlock Text="新人员" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                        <Button Command="{Binding ImportPersonsCommand}"
+                                Style="{StaticResource MaterialDesignOutlinedButton}"
+                                HorizontalContentAlignment="Left"
+                                Margin="0,0,0,8">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Import" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                <TextBlock Text="导入人员" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                        <Button Command="{Binding ExportPersonsCommand}"
+                                Style="{StaticResource MaterialDesignOutlinedButton}"
+                                HorizontalContentAlignment="Left"
+                                Margin="0,0,0,8">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Export" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                <TextBlock Text="导出人员" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                        <Button Command="{Binding ClearAllPersonsCommand}"
+                                Style="{StaticResource MaterialDesignOutlinedButton}"
+                                HorizontalContentAlignment="Left">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="DeleteSweep" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                <TextBlock Text="清空全部" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <!-- 编辑表单区域 -->
+                <materialDesign:Card Grid.Row="1" Padding="0">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="16">
+                            <TextBlock Text="人员信息"
+                                       FontSize="16"
+                                       FontWeight="Bold"
+                                       Margin="0,0,0,16" />
+
+                            <!-- 姓名 -->
+                            <TextBox materialDesign:HintAssist.Hint="姓名 *"
+                                     materialDesign:HintAssist.IsFloating="True"
+                                     Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Margin="0,0,0,12" />
+
+                            <!-- 身份证号 -->
+                            <StackPanel Margin="0,0,0,12">
+                                <TextBox materialDesign:HintAssist.Hint="身份证号 *"
+                                         materialDesign:HintAssist.IsFloating="True"
+                                         Text="{Binding IdCard, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         MaxLength="18">
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Key="Enter" Command="{Binding SavePersonCommand}" />
+                                    </TextBox.InputBindings>
+                                </TextBox>
+
+                                <!-- 验证提示文本 -->
+                                <TextBlock Text="{Binding IdCardValidationMessage}"
+                                           FontSize="11"
+                                           Margin="0,4,0,0"
+                                           Foreground="{DynamicResource MaterialDesignValidationErrorBrush}"
+                                           Visibility="{Binding IdCardValidationMessage, Converter={StaticResource NullToVisibilityConverter}}"
+                                           TextWrapping="Wrap" />
+                            </StackPanel>
+
+                            <!-- 自动计算的信息 -->
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0"
+                                         materialDesign:HintAssist.Hint="性别"
+                                         materialDesign:HintAssist.IsFloating="True"
+                                         Text="{Binding Gender}"
+                                         IsReadOnly="True"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Margin="0,0,4,0" />
+                                <TextBox Grid.Column="1"
+                                         materialDesign:HintAssist.Hint="年龄"
+                                         materialDesign:HintAssist.IsFloating="True"
+                                         Text="{Binding Age}"
+                                         IsReadOnly="True"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         Margin="4,0,0,0" />
+                            </Grid>
+
+                            <!-- 出生日期（只读） -->
+                            <TextBox materialDesign:HintAssist.Hint="出生日期"
+                                     materialDesign:HintAssist.IsFloating="True"
+                                     Text="{Binding BirthDate, StringFormat='yyyy-MM-dd'}"
+                                     IsReadOnly="True"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Margin="0,0,0,12" />
+
+                            <!-- 联系方式1 -->
+                            <TextBox materialDesign:HintAssist.Hint="联系方式1"
+                                     materialDesign:HintAssist.IsFloating="True"
+                                     Text="{Binding Contact1, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Margin="0,0,0,12" />
+
+                            <!-- 联系方式2 -->
+                            <TextBox materialDesign:HintAssist.Hint="联系方式2"
+                                     materialDesign:HintAssist.IsFloating="True"
+                                     Text="{Binding Contact2, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Margin="0,0,0,12" />
+
+                            <!-- 所属部门 -->
+                            <ComboBox materialDesign:HintAssist.Hint="所属部门"
+                                      materialDesign:HintAssist.IsFloating="True"
+                                      ItemsSource="{Binding Departments}"
+                                      Text="{Binding Department, UpdateSourceTrigger=PropertyChanged}"
+                                      Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                      IsEditable="True"
+                                      Margin="0,0,0,12" />
+
+                            <!-- 户籍地址 -->
+                            <TextBox materialDesign:HintAssist.Hint="户籍地址"
+                                     materialDesign:HintAssist.IsFloating="True"
+                                     Text="{Binding RegisteredAddress, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Margin="0,0,0,12" />
+
+                            <!-- 现住址 -->
+                            <TextBox materialDesign:HintAssist.Hint="现住址"
+                                     materialDesign:HintAssist.IsFloating="True"
+                                     Text="{Binding CurrentAddress, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Margin="0,0,0,12" />
+
+                            <!-- 工号 -->
+                            <TextBox materialDesign:HintAssist.Hint="工号"
+                                     materialDesign:HintAssist.IsFloating="True"
+                                     Text="{Binding EmployeeNumber, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Margin="0,0,0,12" />
+
+                            <!-- 职级1 -->
+                            <TextBox materialDesign:HintAssist.Hint="职级1"
+                                     materialDesign:HintAssist.IsFloating="True"
+                                     Text="{Binding Rank1, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Margin="0,0,0,12" />
+
+                            <!-- 职级2 -->
+                            <TextBox materialDesign:HintAssist.Hint="职级2"
+                                     materialDesign:HintAssist.IsFloating="True"
+                                     Text="{Binding Rank2, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Margin="0,0,0,12" />
+
+                            <!-- 职务 -->
+                            <TextBox materialDesign:HintAssist.Hint="职务"
+                                     materialDesign:HintAssist.IsFloating="True"
+                                     Text="{Binding Position, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Margin="0,0,0,12" />
+
+                            <!-- 参与工作时间 -->
+                            <DatePicker materialDesign:HintAssist.Hint="参与工作时间"
+                                        materialDesign:HintAssist.IsFloating="True"
+                                        SelectedDate="{Binding WorkStartDate}"
+                                        Style="{StaticResource MaterialDesignOutlinedDatePicker}"
+                                        Margin="0,0,0,12" />
+
+                            <!-- 保存按钮 -->
+                            <Button Content="保存"
+                                    Command="{Binding SavePersonCommand}"
+                                    Style="{StaticResource MaterialDesignRaisedButton}"
+                                    HorizontalAlignment="Stretch"
+                                    Height="36" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </materialDesign:Card>
+            </Grid>
+        </Grid>
+
+        <!-- 底部状态栏 -->
+        <materialDesign:ColorZone Grid.Row="2"
+                                  Mode="PrimaryDark"
+                                  Padding="12,8"
+                                  materialDesign:ElevationAssist.Elevation="Dp4">
+            <DockPanel>
+                <TextBlock VerticalAlignment="Center"
+                           FontSize="12"
+                           Opacity="0.8">
+                    <Run Text="选中：" />
+                    <Run Text="{Binding SelectedPerson.Name, Mode=OneWay}" />
+                    <Run Text="  |  " />
+                    <Run Text="身份证号：" />
+                    <Run Text="{Binding SelectedPerson.IdCard, Mode=OneWay}" />
+                </TextBlock>
+            </DockPanel>
+        </materialDesign:ColorZone>
+    </Grid>
+</Window>
