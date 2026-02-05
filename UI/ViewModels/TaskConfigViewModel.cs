@@ -629,7 +629,7 @@ public partial class TaskConfigViewModel : ObservableObject
 
                 var schema = new TableSchema
                 {
-                    Title = TaskDescription,
+                    Title = TaskTitle,
                     Columns = ColumnDefinitions.ToList()
                 };
 
